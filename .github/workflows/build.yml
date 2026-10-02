@@ -1,53 +1,53 @@
-name: Build ImmortalWrt 24.10.6 BBR+Qosify
-on:
-  push:
-    branches: [ main ]
+名称: Build ImmortalWrt 24.10.6 BBR+Qosify
+在:
+  推送:
+    分支: [ 主 ]
   workflow_dispatch: # 支持手动点击触发编译
 
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: 拉取仓库代码
-        uses: actions/checkout@v4
+职位:
+  构建:
+    运行于: ubuntu-22.04
+    步骤:
+      - 名称: 拉取仓库代码
+        使用: actions/checkout@v4
 
-      - name: 安装编译依赖
-        run: |
+      - 名称: 安装编译依赖
+        运行: |
           sudo apt update
           sudo apt install -y build-essential libncurses-dev gawk flex bison openssl libssl-dev \
           dkms libelf-dev libudev-dev libpci-dev libiberty-dev autoconf automake \
           git wget curl rsync unzip python3 python3-pip
           sudo rm -rf /var/lib/apt/lists/*
 
-      - name: 克隆ImmortalWrt源码，锁定目标commit
-        run: |
+      - 名称: 克隆ImmortalWrt源码，锁定目标commit
+        运行: |
           git clone https://github.com/immortalwrt/immortalwrt.git ./immortalwrt
           cd ./immortalwrt
           git checkout cf234f8de6d5 # 固定和你当前固件一致的commit r33869
 
-      - name: 添加插件源 feeds.conf.default
-        run: |
+      - 名称: 添加插件源 feeds.conf.default
+        运行: |
           cd ./immortalwrt
           echo 'src-git tcpbbr https://github.com/chenmozhijin/luci-app-tcpbbr.git' >> feeds.conf.default
           echo 'src-git qosify https://github.com/immortalwrt-collections/openwrt-qosify.git' >> feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: 预置files目录（BBR sysctl + uci-defaults自动脚本）
-        run: |
+      - 名称: 预置files目录（BBR sysctl + uci-defaults自动脚本）
+        运行: |
           cd ./immortalwrt
           mkdir -p files/etc/sysctl.d
           mkdir -p files/etc/uci-defaults
           # 写入BBR sysctl配置
-          cat > files/etc/sysctl.d/99-bbr.conf <<EOF
-net.core.default_qdisc=fq
-net.ipv4.tcp_congestion_control=bbr
+          cat > files/etc/sysctl.d/99-bbr.conf < 
+          net.core.default_qdisc=fq
+          net.ipv4.tcp_congestion_control=bbr
 EOF
           # 写入首次开机自动配置脚本
-          cat > files/etc/uci-defaults/99-custom.sh <<EOF
+          cat > files/etc/uci-defaults/99-custom.sh <
 #!/bin/sh
-cat > /etc/sysctl.d/99-bbr.conf <<CONF
-net.core.default_qdisc=fq
+cat > /etc/sysctl.d/99-bbr.conf <
+退出 0
 net.ipv4.tcp_congestion_control=bbr
 CONF
 sysctl -p /etc/sysctl.d/99-bbr.conf
