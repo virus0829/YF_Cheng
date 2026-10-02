@@ -1,4 +1,4 @@
-名称: Build ImmortalWrt 24.10.6 BBR+Qosify
+名称: 构建 ImmortalWrt 24.10.6 BBR+Qosify
 在:
   推送:
     分支: [ 主 ]
@@ -39,10 +39,10 @@
           mkdir -p files/etc/sysctl.d
           mkdir -p files/etc/uci-defaults
           # 写入BBR sysctl配置
-          cat > files/etc/sysctl.d/99-bbr.conf < 
+          cat > files/etc/sysctl.d/99-bbr.conf <
           net.core.default_qdisc=fq
           net.ipv4.tcp_congestion_control=bbr
-EOF
+          EOF
           # 写入首次开机自动配置脚本
           cat > files/etc/uci-defaults/99-custom.sh <
 #!/bin/sh
